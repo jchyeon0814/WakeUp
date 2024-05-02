@@ -64,7 +64,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Presenter\BlackScreen.cs" />
     <Compile Include="Service\Util.cs" />
     <Compile Include="Service\YoutubeService.cs" />
     <Compile Include="View\BlackForm.cs">
@@ -129,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Presenter\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

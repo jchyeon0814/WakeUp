@@ -92,21 +92,10 @@ namespace wakeUp
                 {
                     TaskKill("chrome");
                 }
-                else if (curTime == "0439")
+                else if (curTime == "0430")
                 {
                     TaskKill("chrome");
 
-                    if(blackForms != null) 
-                    { 
-                        for (int i = 0; i < blackForms.Length; i++)
-                        {
-                            if (blackForms[i] != null && !blackForms[i].IsDisposed)
-                            {
-                                blackForms[i].SetShowWhether(true);
-                            }
-                        }
-                    }
-                    
                     new Thread(() =>
                     {
                         try
@@ -129,10 +118,8 @@ namespace wakeUp
                         }
                     }).Start();
                 }
-                else if (curTime == "0510")
+                else if (curTime == "0530")
                 {
-                    TaskKill("KakaoTalk");
-
                     TaskKill("chrome");
 
                     new Thread(() =>
@@ -170,8 +157,6 @@ namespace wakeUp
                 }
                 else if (curTime == "0700")
                 {
-                    TaskKill("KakaoTalk");
-
                     TaskKill("chrome");
 
                     new Thread(() =>
