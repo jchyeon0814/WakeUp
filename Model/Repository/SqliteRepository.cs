@@ -24,7 +24,10 @@ namespace wakeUp.Model.Repository
 
         public SqliteRepository(string dbPath, int version)
         {
-            //SQLiteConnection.CreateFile(dbPath);
+            if(!System.IO.File.Exists(dbPath))
+            {
+                SQLiteConnection.CreateFile(dbPath);
+            }
 
             this.dbPath = dbPath;
             this.version = version;
