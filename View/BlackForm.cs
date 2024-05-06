@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using wakeUp.Service;
+using wakeUp.View;
 
 namespace wakeUp
 {
@@ -115,6 +116,15 @@ namespace wakeUp
             SetShowWhether(!pnl날씨.Visible);
         }
 
+        private void btn설정_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = new Settings().ShowDialog();
+            if(dr == DialogResult.OK)
+            {
+
+            }
+        }
+
         public void SetShowWhether(bool show)
         {
             if (show)
@@ -189,6 +199,7 @@ namespace wakeUp
                 btn타이머.BackColor = Color.DimGray;
             }
         }
+
     }
 
     

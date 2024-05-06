@@ -14,7 +14,10 @@ using System.Runtime.Remoting.Messaging;
 using System.Security.Policy;
 using System.Threading;
 using System.Windows.Forms;
+using wakeUp.Model;
 using wakeUp.Service;
+using System.Data.SQLite;
+using static System.Net.WebRequestMethods;
 
 namespace wakeUp
 {
@@ -30,19 +33,46 @@ namespace wakeUp
             public string title;
         }
 
+        private YoutubeTimeTable[] ytt = new YoutubeTimeTable[]
+        {
+            new YoutubeTimeTable("0000"),
+            new YoutubeTimeTable("0100"),
+            new YoutubeTimeTable("0200"),
+            new YoutubeTimeTable("0300"),
+            new YoutubeTimeTable("0400"),
+            new YoutubeTimeTable("0430", "chartdoong2", YoutubeTimeTable.ExecuteMode.RECENTLY),
+            new YoutubeTimeTable("0530", "Cold_Water", YoutubeTimeTable.ExecuteMode.REALTIME),
+            new YoutubeTimeTable("0600", "newskbs", "광장|어디서나", YoutubeTimeTable.ExecuteMode.REALTIME),
+            new YoutubeTimeTable("0700", "Cold_Water", YoutubeTimeTable.ExecuteMode.REALTIME),
+            new YoutubeTimeTable("0820"),
+        };
+
+        private YoutubeTimeTable[] yTimeTables = null;
+
+        private YoutubeTimeTableModel youtubeTimeTableModel;
+
         public Form1()
         {
             InitializeComponent();
 
-            autoStartTimer.Start();
-            //autoStartTimer_Tick(null, null);
+            youtubeTimeTableModel = YoutubeTimeTableModel.GetSingletonInstance();
 
+            //youtubeTimeTableModel.InsertNUpdate(ytt);
+
+            yTimeTables = youtubeTimeTableModel.Select().ToArray();
+
+            OpenBlackForm();
+
+            autoStartTimer_Tick(null, null);
+
+            autoStartTimer.Start();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
         }
+
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -55,6 +85,16 @@ namespace wakeUp
         {
             BlackForm form = sender as BlackForm;
             form.CloseFullScreen();
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                TaskKill("chromedriver");
+
+                this.Close();
+            }
         }
 
         private void autoStartTimer_Tick(object sender, EventArgs e)
@@ -72,118 +112,89 @@ namespace wakeUp
                 {
                     OpenBlackForm();
                 }
-                else if (curTime == "0000")
-                {
-                    TaskKill("chrome");
-                }
-                else if (curTime == "0100")
-                {
-                    TaskKill("chrome");
-                }
-                else if (curTime == "0200")
-                {
-                    TaskKill("chrome");
-                }
-                else if (curTime == "0300")
-                {
-                    TaskKill("chrome");
-                }
-                else if (curTime == "0400")
-                {
-                    TaskKill("chrome");
-                }
-                else if (curTime == "0430")
-                {
-                    TaskKill("chrome");
 
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            YoutubeVideo[] melonVideos = this.GetPlayListVideo("https://www.youtube.com/@chartdoong2/videos");
-                            StartVideoPlay(melonVideos[0]);
-                        }
-                        catch(Exception ex)
-                        {
-                            Util.WriteLogFile(ex);
-
-                            try
-                            {
-                                ShowMessageBox(ex.Message);
-                            }
-                            catch(Exception ex2)
-                            {
-                                Util.WriteLogFile(ex2);
-                            }
-                        }
-                    }).Start();
-                }
-                else if (curTime == "0530")
-                {
-                    TaskKill("chrome");
-
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            YoutubeVideo[] popVideos = GetRealTimeVideo("https://www.youtube.com/@Cold_Water/streams", "");
-                            StartRandomVideoPlay(popVideos);
-                        }
-                        catch (Exception ex)
-                        {
-                            Util.WriteLogFile(ex);
-
-                            ShowMessageBox(ex.Message);
-                        }
-                    }).Start();
-                }
-                else if (curTime == "0600")
-                {
-                    TaskKill("chrome");
-
-                    new Thread(() =>
-                    {
-                        try {
-                            YoutubeVideo[] newsVideos = GetRealTimeVideo("https://www.youtube.com/@newskbs/streams", "광장|어디서나");
-                            StartVideoPlayFilteredByTitle(newsVideos, "");
-                        }
-                        catch (Exception ex)
-                        {
-                            Util.WriteLogFile(ex);
-
-                            ShowMessageBox(ex.Message);
-                        }
-                    }).Start();
-                }
-                else if (curTime == "0700")
-                {
-                    TaskKill("chrome");
-
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            YoutubeVideo[] popVideos = GetRealTimeVideo("https://www.youtube.com/@Cold_Water/streams", "");
-                            StartRandomVideoPlay(popVideos);
-                        }
-                        catch (Exception ex)
-                        {
-                            Util.WriteLogFile(ex);
-
-                            ShowMessageBox(ex.Message);
-                        }
-                    }).Start();
-                }
-                else if (curTime == "0820")
+                if (curTime == "0820")
                 {
                     TaskKill("KakaoTalk");
-
-                    TaskKill("chrome");
                 }
+
+                yTimeTables = youtubeTimeTableModel.Select().ToArray();
+
+                SchedulingTimeTable(yTimeTables, curTime);
             }
             catch (Exception ex)
             {
                 Util.WriteLogFile(ex);
+            }
+        }
+
+        private void SchedulingTimeTable(YoutubeTimeTable[] youtubeTimeTables, string hhmm)
+        {
+            foreach (YoutubeTimeTable timeTable in youtubeTimeTables)
+            {
+                if (timeTable.GetStartTime() != hhmm && timeTable.GetStartTime() != "9999")
+                {
+                    continue;
+                }
+
+                TaskKill("chrome");
+
+                YoutubeTimeTable.ExecuteMode mode = timeTable.GetExecuteMode();
+
+                switch (mode)
+                {
+                    case YoutubeTimeTable.ExecuteMode.RECENTLY:
+                        {
+                            new Thread(() =>
+                            {
+                                try
+                                {
+                                    string playUrl = $@"https://www.youtube.com/@{timeTable.GetChannel()}/videos";
+
+                                    YoutubeVideo[] melonVideos = GetPlayListVideo(playUrl);
+                                    StartVideoPlay(melonVideos[0]);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Util.WriteLogFile(ex);
+
+                                    try
+                                    {
+                                        ShowMessageBox(ex.Message);
+                                    }
+                                    catch (Exception ex2)
+                                    {
+                                        Util.WriteLogFile(ex2);
+                                    }
+                                }
+                            }).Start();
+                        }
+                        break;
+
+                    case YoutubeTimeTable.ExecuteMode.REALTIME:
+                        {
+                            new Thread(() =>
+                            {
+                                try
+                                {
+                                    string playUrl = $@"https://www.youtube.com/@{timeTable.GetChannel()}/streams";
+
+                                    YoutubeVideo[] newsVideos = GetRealTimeVideo(playUrl, timeTable.GetTitleKeyword());
+                                    StartVideoPlay(newsVideos);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Util.WriteLogFile(ex);
+
+                                    ShowMessageBox(ex.Message);
+                                }
+                            }).Start();
+                        }
+                        break;
+
+                    case YoutubeTimeTable.ExecuteMode.NONE:
+                        break;
+                }
             }
         }
 
@@ -332,35 +343,19 @@ namespace wakeUp
             }
         }
 
-        private void StartRandomVideoPlay(YoutubeVideo[] vidoes)
+        private void StartVideoPlay(YoutubeVideo[] videos)
         {
             Random random = new Random(DateTime.Now.Millisecond);
-            int index = random.Next(vidoes.Length);
+            int index = random.Next(videos.Length);
 
             Process.Start("chrome.exe");
-            Process.Start(vidoes[index].url);
+
+            Process.Start(videos[index].url);
         }
 
-        private void StartVideoPlayFilteredByTitle(YoutubeVideo[] vidoes, string keyword)
+        private void StartVideoPlay(YoutubeVideo video)
         {
-            if (vidoes.Length > 0)
-            {
-                for (int i = 0; i < vidoes.Length; i++)
-                {
-                    if (string.IsNullOrEmpty(keyword) || vidoes[i].title.Contains(keyword))
-                    {
-                        Process.Start("chrome.exe");
-                        Process.Start(vidoes[i].url);
-                        break;
-                    }
-                }
-            }
-        }
-
-        private void StartVideoPlay(YoutubeVideo vidoe)
-        {
-            Process.Start("chrome.exe");
-            Process.Start(vidoe.url);
+            StartVideoPlay(new YoutubeVideo[] { video });
         }
 
         private void OpenBlackForm()
@@ -381,7 +376,6 @@ namespace wakeUp
 
         private void CloseAllBlackForm()
         {
-            
             if (blackForms == null)
             {
                 return;
@@ -418,16 +412,6 @@ namespace wakeUp
             for (int i = 0; i < processList.Length; i++)
             {
                 processList[i].Kill();
-            }
-        }
-
-        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
-        {
-            if(e.Button == MouseButtons.Right)
-            {
-                TaskKill("chromedriver");
-
-                this.Close();
             }
         }
     }
