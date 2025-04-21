@@ -20,9 +20,13 @@ namespace wakeUp
 
         private static bool useTimer = true;
 
-        public BlackForm()
+        private MainForm main = null;
+
+        public BlackForm(MainForm main)
         {
             InitializeComponent();
+
+            this.main = main;
 
             SetUseTimer(true);
             SetShowClock(true);
@@ -96,6 +100,7 @@ namespace wakeUp
             var browser = webBrowser.ActiveXInstance as SHDocVw.InternetExplorer;
             browser.ExecWB(SHDocVw.OLECMDID.OLECMDID_OPTICAL_ZOOM, SHDocVw.OLECMDEXECOPT.OLECMDEXECOPT_DODEFAULT, 80, IntPtr.Zero);
             webBrowser.Document.Window.ScrollTo(0, 150);
+            webBrowser.Document.BackColor = Color.Black;
         }
 
         private void btn타이머_Click(object sender, EventArgs e)
@@ -121,8 +126,13 @@ namespace wakeUp
             DialogResult dr = new Settings().ShowDialog();
             if(dr == DialogResult.OK)
             {
-
+                main.InitData();
             }
+        }
+
+        private void btn실행_Click(object sender, EventArgs e)
+        {
+
         }
 
         public void SetShowWhether(bool show)
@@ -137,6 +147,7 @@ namespace wakeUp
                 webBrowser.Margin = new System.Windows.Forms.Padding(0);
                 webBrowser.Padding = new System.Windows.Forms.Padding(0);
                 webBrowser.DocumentCompleted += WebBrowser_DocumentCompleted;
+                webBrowser.ScriptErrorsSuppressed = true;
                 webBrowser.Scale(new SizeF(0.5f, 0.5f));
                 webBrowser.Url = new Uri("https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=%EC%84%9C%EC%9A%B8+%EB%82%A0%EC%94%A8&oquery=%EC%84%9C%EC%9A%B8+%EC%98%A4%EB%8A%98%EB%82%A0%EC%94%A8&tqi=h0lORsp0J1Zssl%2BjF6NssssssIh-167064");
 

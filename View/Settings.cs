@@ -42,9 +42,10 @@ namespace wakeUp.View
 
                 youtubeTimeTableModel.DeleteNInsert(youtubeTimeTableList);
 
-                youtubeTimeTables = youtubeTimeTableModel.Select();
+                this.DialogResult = DialogResult.OK;
+                //youtubeTimeTables = youtubeTimeTableModel.Select();
 
-                SetPnl설정컨테이너Data(youtubeTimeTables);
+                //SetPnl설정컨테이너Data(youtubeTimeTables);
             }
             catch(Exception ex)
             {
@@ -131,6 +132,7 @@ namespace wakeUp.View
             dt.Rows.Add("중지", (int) YoutubeTimeTable.ExecuteMode.NONE);
             dt.Rows.Add("실시간", (int) YoutubeTimeTable.ExecuteMode.REALTIME);
             dt.Rows.Add("가장최근", (int) YoutubeTimeTable.ExecuteMode.RECENTLY);
+            dt.Rows.Add("동영상 무작위", (int)YoutubeTimeTable.ExecuteMode.RECORD_RANDOM);
 
             CheckBox chk = new CheckBox();
             TextBox tbx시간 = new TextBox();

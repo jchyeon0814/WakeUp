@@ -14,7 +14,7 @@ namespace wakeUp.Model
         
         private static YoutubeTimeTableModel youtubeTimeTableModel = null;
 
-        private static readonly string DB_NAME = "wakeupDB";
+        private static readonly string DB_NAME = "C:\\Users\\jchye\\Documents\\wakeUp\\bin\\Debug\\wakeupDB";
 
         private static readonly string TABLE_NAME = "youtube_time_table";
 

@@ -15,6 +15,7 @@ namespace wakeUp.Model
             NONE = 0,
             RECENTLY = 1,
             REALTIME = 2,
+            RECORD_RANDOM = 3,
         }
 
         private int seq;
