@@ -80,7 +80,7 @@ namespace wakeUp
 
             InitData();
 
-            OpenBlackForm();
+            //OpenBlackForm();
 
             int curHour = Int32.Parse(DateTime.Now.ToString("HH"));
 
@@ -612,6 +612,11 @@ namespace wakeUp
 
         private void ShowWhether()
         {
+            if(blackForms == null)
+            {
+                return;
+            }
+
             for (int i = 0; i < blackForms.Length; i++)
             {
                 if(blackForms[i] == null)
