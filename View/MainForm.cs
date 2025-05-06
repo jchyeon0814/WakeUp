@@ -159,7 +159,7 @@ namespace wakeUp
                 {
                     if (curTime == "0500")
                     {
-                        OpenBlackForm();
+                        //OpenBlackForm();
                         ShowWhether();
                     }
 
@@ -185,8 +185,7 @@ namespace wakeUp
 
                 WakeUpScreen();
 
-                TaskKill("msedge.exe");
-                TaskKill("msedgewebview2.exe");
+                TaskKill("Whale.exe");
 
                 YoutubeTimeTable.ExecuteMode mode = timeTable.GetExecuteMode();
 
@@ -484,8 +483,8 @@ namespace wakeUp
             
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-                Arguments = "--app=\"" + videos[index].url + "\"",
+                FileName = @"C:\Program Files\Naver\Naver Whale\Application\whale.exe",
+                Arguments = "--autoplay-policy=no-user-gesture-required " + videos[index].url,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -528,8 +527,8 @@ namespace wakeUp
         {
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                FileName = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-                Arguments = "--app=\"" + video.url + "\"",
+                FileName = @"C:\Program Files\Naver\Naver Whale\Application\whale.exe",
+                Arguments = "--autoplay-policy=no-user-gesture-required " + video.url,
                 UseShellExecute = true,
                 //CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Normal,

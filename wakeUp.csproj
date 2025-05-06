@@ -139,9 +139,6 @@
     <None Include="Resources\star.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms">
-      <Version>114.2.100</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.Web.WebView2">
       <Version>1.0.1823.32</Version>
     </PackageReference>
